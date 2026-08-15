@@ -99,6 +99,13 @@ class UserProfile(TimeStampedModel):
         filled = sum(1 for value in fields if value)
         return int((filled / len(fields)) * 100)
 
+    @property
+    def primary_photo(self):
+        for photo in self.photos.all():
+            if photo.has_image_file:
+                return photo
+        return None
+
 
 class ProfilePhoto(TimeStampedModel):
     profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="photos")
@@ -112,6 +119,12 @@ class ProfilePhoto(TimeStampedModel):
 
     def __str__(self):
         return f"Photo for {self.profile}"
+
+    @property
+    def has_image_file(self):
+        if not self.image:
+            return False
+        return self.image.storage.exists(self.image.name)
 
 
 class PartnerPreference(TimeStampedModel):

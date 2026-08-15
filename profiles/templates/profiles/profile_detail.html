@@ -5,7 +5,7 @@
 <div class="gm-card p-3 p-lg-4 mb-3">
     <div class="row g-3 align-items-start">
         <div class="col-lg-3">
-            {% with primary=profile.photos.first %}
+            {% with primary=profile.primary_photo %}
                 {% if primary %}
                     <img src="{{ primary.image.url }}" class="profile-photo" alt="{{ profile.full_name }}">
                 {% else %}

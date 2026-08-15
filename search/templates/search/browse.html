@@ -31,7 +31,7 @@
             {% for profile in profiles %}
                 <div class="col-md-6 col-xl-4">
                     <div class="gm-card h-100">
-                        {% with p=profile.photos.first %}
+                        {% with p=profile.primary_photo %}
                             {% if p %}
                                 <img src="{{ p.image.url }}" class="profile-photo" alt="{{ profile.full_name }}">
                             {% else %}

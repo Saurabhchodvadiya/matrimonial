@@ -54,7 +54,11 @@
                 <div class="row g-2">
                     {% for photo in profile.photos.all %}
                         <div class="col-6">
-                            <img src="{{ photo.image.url }}" class="profile-photo" alt="photo">
+                            {% if photo.has_image_file %}
+                                <img src="{{ photo.image.url }}" class="profile-photo" alt="photo">
+                            {% else %}
+                                <div class="profile-photo d-flex align-items-center justify-content-center gm-muted">{% trans "File missing" %}</div>
+                            {% endif %}
                             {% if photo.is_primary %}<span class="badge text-bg-success mt-1">Primary</span>{% endif %}
                             <form method="post" action="{% url 'profiles:delete-photo' photo.id %}" class="mt-1">
                                 {% csrf_token %}

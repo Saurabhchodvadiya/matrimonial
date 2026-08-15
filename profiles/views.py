@@ -53,8 +53,11 @@ def add_photo_view(request):
     if photo_form.is_valid():
         photo = photo_form.save(commit=False)
         photo.profile = profile
-        if photo.is_primary:
+        existing_primary = profile.photos.filter(is_primary=True).first()
+        has_valid_primary = existing_primary.has_image_file if existing_primary else False
+        if photo.is_primary or not has_valid_primary:
             profile.photos.update(is_primary=False)
+            photo.is_primary = True
         photo.save()
         messages.success(request, "Photo uploaded successfully.")
     else:
