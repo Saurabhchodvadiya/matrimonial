@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">{% trans "My Matrimonial Profile" %}</h3>
+    <span class="badge text-bg-light fs-6">{% trans "Completion" %}: {{ profile.completion_percentage }}%</span>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="gm-card mb-4">
+            <div class="p-3 p-lg-4">
+                <h5 class="mb-3">👤 {% trans "About Me & Profile Details" %}</h5>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ profile_form.as_p }}
+                    <h5 class="mt-4">❤️ {% trans "Looking For" %}</h5>
+                    {{ preference_form.as_p }}
+                    <button class="btn gm-btn-primary">{% trans "Save Profile" %}</button>
+                </form>
+                <p class="tiny gm-muted mt-2 mb-0">{% trans "Biodata file supports PDF, DOC, DOCX." %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="gm-card mb-4">
+            <div class="p-3">
+                <h5>{% trans "Profile Status" %}</h5>
+                <p class="mb-2">
+                    {% if profile.is_profile_active %}
+                        <span class="badge text-bg-success">{% trans "Active" %}</span>
+                    {% else %}
+                        <span class="badge text-bg-secondary">{% trans "Inactive" %}</span>
+                    {% endif %}
+                </p>
+                <form method="post" action="{% url 'profiles:toggle-active' %}">
+                    {% csrf_token %}
+                    <button class="btn gm-btn-outline btn-sm">{% trans "Activate / Deactivate" %}</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="gm-card">
+            <div class="p-3">
+                <h5>{% trans "Manage Photos" %}</h5>
+                <form method="post" action="{% url 'profiles:add-photo' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ photo_form.as_p }}
+                    <button class="btn gm-btn-primary btn-sm">{% trans "Upload Photo" %}</button>
+                </form>
+                <hr>
+                <div class="row g-2">
+                    {% for photo in profile.photos.all %}
+                        <div class="col-6">
+                            <img src="{{ photo.image.url }}" class="profile-photo" alt="photo">
+                            {% if photo.is_primary %}<span class="badge text-bg-success mt-1">Primary</span>{% endif %}
+                            <form method="post" action="{% url 'profiles:delete-photo' photo.id %}" class="mt-1">
+                                {% csrf_token %}
+                                <button class="btn gm-btn-outline btn-sm w-100">{% trans "Delete" %}</button>
+                            </form>
+                        </div>
+                    {% empty %}
+                        <p class="gm-muted">{% trans "No photos uploaded yet." %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

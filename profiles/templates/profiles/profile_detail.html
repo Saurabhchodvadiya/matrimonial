@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="gm-card p-3 p-lg-4 mb-3">
+    <div class="row g-3 align-items-start">
+        <div class="col-lg-3">
+            {% with primary=profile.photos.first %}
+                {% if primary %}
+                    <img src="{{ primary.image.url }}" class="profile-photo" alt="{{ profile.full_name }}">
+                {% else %}
+                    <div class="profile-photo d-flex align-items-center justify-content-center gm-muted">{% trans "No photo available" %}</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <div>
+                    <h3 class="mb-1">{{ profile.full_name }}, {{ profile.age|default:"-" }}</h3>
+                    <p class="gm-muted mb-2">{{ profile.current_location|default:profile.hometown|default:"-" }}</p>
+                </div>
+                <span class="badge text-bg-light">{% trans "Verified profile" %}</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2 tiny mb-3">
+                <span class="badge text-bg-light">{{ profile.religion|default:"Religion not shared" }}</span>
+                <span class="badge text-bg-light">{{ profile.community|default:"Community optional" }}</span>
+                <span class="badge text-bg-light">{{ profile.gujarati_speaking|title }} {% trans "Gujarati" %}</span>
+            </div>
+            <div class="tiny mb-3">
+                {% if can_view_contact %}
+                    <p class="mb-1"><strong>{% trans "Phone" %}:</strong> {{ profile.phone|default:"-" }}</p>
+                    <p class="mb-0"><strong>{% trans "Email" %}:</strong> {{ profile.user.email|default:"-" }}</p>
+                {% else %}
+                    <p class="gm-muted mb-0">{% trans "Contact details will be visible after interest is accepted or when profile owner allows it." %}</p>
+                {% endif %}
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                {% if interest_ui.can_send %}
+                    <form method="post" action="{% url 'interests:send' profile.id %}">
+                        {% csrf_token %}
+                        <button class="btn gm-btn-primary">{% trans "Express Interest" %}</button>
+                    </form>
+                {% elif interest_ui.can_withdraw %}
+                    <form method="post" action="{% url 'interests:withdraw' profile.id %}">
+                        {% csrf_token %}
+                        <button class="btn gm-btn-outline">{% trans "Withdraw Interest" %}</button>
+                    </form>
+                    <button class="btn gm-btn-primary" disabled>{{ interest_ui.label }}</button>
+                {% elif interest_ui.can_review_inbox %}
+                    <a class="btn gm-btn-primary" href="{% url 'interests:inbox' %}">{{ interest_ui.label }} - {% trans "Review" %}</a>
+                {% else %}
+                    <button class="btn gm-btn-primary" disabled>{{ interest_ui.label }}</button>
+                {% endif %}
+                <form method="post" action="{% url 'interests:shortlist' profile.id %}">
+                    {% csrf_token %}
+                    <button class="btn gm-btn-outline">{% trans "Save profile" %}</button>
+                </form>
+                {% if is_blocked_by_viewer %}
+                    <form method="post" action="{% url 'interests:unblock' profile.id %}">
+                        {% csrf_token %}
+                        <button
+                            class="btn gm-btn-outline"
+                            type="submit"
+                            onclick="return confirm('{% trans "Do you want to unblock this profile?" %}');"
+                        >
+                            {% trans "Unblock" %}
+                        </button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'interests:block' profile.id %}">
+                        {% csrf_token %}
+                        <button
+                            class="btn gm-btn-outline"
+                            type="submit"
+                            onclick="return confirm('{% trans "Do you want to block this profile?" %}');"
+                        >
+                            {% trans "Block" %}
+                        </button>
+                    </form>
+                {% endif %}
+                <a class="btn gm-btn-outline" href="{% url 'reports:create' profile.id %}">{% trans "Report" %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="gm-card p-3 mb-3">
+    <h5 class="mb-2">{% trans "About Me" %}</h5>
+    <p class="mb-0">{{ profile.about_me|default:"-" }}</p>
+</div>
+
+<div class="gm-card p-3 mb-3">
+    <h5 class="mb-2">{% trans "Biodata" %}</h5>
+    {% if profile.biodata_file %}
+        <a href="{{ profile.biodata_file.url }}" target="_blank" rel="noopener" class="btn gm-btn-outline btn-sm">
+            {% trans "View Biodata" %}
+        </a>
+    {% else %}
+        <p class="mb-0 gm-muted tiny">{% trans "Biodata file not uploaded yet." %}</p>
+    {% endif %}
+</div>
+
+<div class="gm-card p-3 mb-3">
+    <h5 class="mb-2">{% trans "Education & Career" %}</h5>
+    <div class="row">
+        <div class="col-md-6 tiny">{% trans "Education" %}: {{ profile.highest_education|default:"-" }}</div>
+        <div class="col-md-6 tiny">{% trans "Profession" %}: {{ profile.profession|default:"-" }}</div>
+    </div>
+</div>
+
+<div class="gm-card p-3 mb-3">
+    <h5 class="mb-2">{% trans "Family" %}</h5>
+    <p class="mb-0">{{ profile.family_details|default:"-" }}</p>
+</div>
+
+<div class="gm-card p-3 mb-3">
+    <h5 class="mb-2">{% trans "Gujarati Background" %}</h5>
+    <p class="mb-0 tiny">
+        {% trans "Religion" %}: {{ profile.religion|default:"-" }} |
+        {% trans "Community" %}: {{ profile.community|default:"-" }} |
+        {% trans "Mother Tongue" %}: {{ profile.mother_tongue|default:"Gujarati" }}
+    </p>
+</div>
+
+<div class="gm-card p-3">
+    <h5 class="mb-2">{% trans "Partner Preferences" %}</h5>
+    {% if profile.preference %}
+        <p class="mb-1 tiny">{% trans "Age" %}: {{ profile.preference.min_age }} - {{ profile.preference.max_age }}</p>
+        <p class="mb-1 tiny">{% trans "Religion" %}: {{ profile.preference.preferred_religion|default:"Any" }}</p>
+        <p class="mb-0 tiny">{% trans "Community" %}: {{ profile.preference.preferred_community|default:"Any" }}</p>
+    {% else %}
+        <p class="mb-0 gm-muted tiny">{% trans "Preference details not added yet." %}</p>
+    {% endif %}
+</div>
+{% endblock %}

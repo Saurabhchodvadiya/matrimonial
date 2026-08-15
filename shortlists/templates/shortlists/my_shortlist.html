@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}My Shortlist{% endblock %}
+{% block content %}
+<h3 class="mb-3">{% trans "My Shortlist" %}</h3>
+<div class="row g-3">
+    {% for item in shortlist_items %}
+        <div class="col-md-6 col-lg-4">
+            <div class="gm-card h-100">
+                <div class="p-3">
+                    <h5>{{ item.target.full_name }}</h5>
+                    <p class="gm-muted mb-2">
+                        {{ item.target.age|default:"-" }} •
+                        {{ item.target.current_location.city|default:item.target.hometown|default:"-" }}
+                    </p>
+                    <p class="mb-3">{{ item.target.profession|default:"-" }}</p>
+                    <a class="btn gm-btn-outline btn-sm" href="{% url 'profiles:detail' item.target.id %}">
+                        {% trans "View Profile" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info mb-0">
+                {% trans "You haven't shortlisted anyone yet." %}
+                <a href="{% url 'search:browse' %}" class="alert-link ms-1">{% trans "Explore Matches" %}</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

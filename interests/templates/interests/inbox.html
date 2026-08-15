@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h3 class="mb-3">{% trans "Interests & Shortlist" %}</h3>
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="gm-card">
+            <div class="p-3">
+                <h5>{% trans "Received Interests" %}</h5>
+                {% for item in received %}
+                    <div class="border p-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <div>
+                                <strong>{{ item.from_profile.full_name }}</strong> -
+                                <span class="badge text-bg-light">{{ item.status }}</span>
+                            </div>
+                            <a href="{% url 'profiles:detail' item.from_profile.id %}" class="btn gm-btn-outline btn-sm">
+                                {% trans "View Profile" %}
+                            </a>
+                        </div>
+                        {% if item.status == "pending" %}
+                            <div class="mt-2 d-flex gap-2">
+                                <form method="post" action="{% url 'interests:respond' item.id 'accept' %}">
+                                    {% csrf_token %}<button class="btn gm-btn-primary btn-sm">{% trans "Accept" %}</button>
+                                </form>
+                                <form method="post" action="{% url 'interests:respond' item.id 'decline' %}">
+                                    {% csrf_token %}<button class="btn gm-btn-outline btn-sm">{% trans "Decline" %}</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="gm-muted">{% trans "No interests received yet." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="gm-card mb-4">
+            <div class="p-3">
+                <h5>{% trans "Sent Interests" %}</h5>
+                {% for item in sent %}
+                    <div class="border p-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <div>
+                                <strong>{{ item.to_profile.full_name }}</strong> -
+                                <span class="badge text-bg-light">{{ item.status }}</span>
+                            </div>
+                            <a href="{% url 'profiles:detail' item.to_profile.id %}" class="btn gm-btn-outline btn-sm">
+                                {% trans "View Profile" %}
+                            </a>
+                        </div>
+                        {% if item.status == "pending" %}
+                            <form method="post" action="{% url 'interests:withdraw' item.to_profile.id %}" class="mt-2">
+                                {% csrf_token %}<button class="btn gm-btn-outline btn-sm">{% trans "Withdraw" %}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="gm-muted">{% trans "No interests sent yet." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="gm-card">
+            <div class="p-3">
+                <h5>{% trans "Shortlist" %}</h5>
+                {% for item in shortlist %}
+                    <div class="d-flex justify-content-between border p-2 mb-2">
+                        <span>{{ item.target.full_name }}</span>
+                        <a href="{% url 'profiles:detail' item.target.id %}" class="btn gm-btn-outline btn-sm">{% trans "Open" %}</a>
+                    </div>
+                {% empty %}
+                    <p class="gm-muted">{% trans "No shortlisted profiles." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="gm-card mt-4">
+            <div class="p-3">
+                <h5>{% trans "Blocked Users" %}</h5>
+                {% for item in blocked_users %}
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
+                        <div>
+                            <strong>{{ item.blocked.full_name }}</strong>
+                            <div class="tiny gm-muted">{{ item.reason|default:"Blocked by you" }}</div>
+                        </div>
+                        <form method="post" action="{% url 'interests:unblock' item.blocked.id %}">
+                            {% csrf_token %}
+                            <button
+                                class="btn gm-btn-outline btn-sm"
+                                type="submit"
+                                onclick="return confirm('{% trans "Do you want to unblock this profile?" %}');"
+                            >
+                                {% trans "Unblock" %}
+                            </button>
+                        </form>
+                    </div>
+                {% empty %}
+                    <p class="gm-muted">{% trans "No blocked users." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

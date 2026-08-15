@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}LevaBandhan - Home{% endblock %}
+{% block main_class %}container-fluid px-0 py-0{% endblock %}
+{% block content %}
+<section class="gm-hero">
+    <div class="container-xl gm-hero-inner">
+        <div class="row">
+            <div class="col-lg-6">
+                {% if LANGUAGE_CODE == "gu" %}
+                    <p class="text-uppercase tiny text-white-50 mb-3">લેવા પટેલ સમાજ દ્વારા, લેવા પટેલ સમાજ માટે</p>
+                    <h1>મિલન સંબંધો<br><em>ગામ અને ગોત્ર આધારિત</em></h1>
+                    <p class="lead mt-3">LevaBandhan ગુજરાત અને વિશ્વભરના લેવા પટેલ પરિવારોને જોડે છે - વેરિફાઇડ પ્રોફાઇલ્સ, નેટિવ ગામ અને ગોત્ર શોધ સાથે.</p>
+                {% else %}
+                    <p class="text-uppercase tiny text-white-50 mb-3">{% trans "By the Leva Patel community, for the Leva Patel community" %}</p>
+                    <h1>{% trans "Alliances rooted" %}<br><em>{% trans "in gam and gotra" %}</em></h1>
+                    <p class="lead mt-3">{% trans "LevaBandhan connects Leva Patel families across Gujarat and the diaspora — verified profiles, native gam and gotra search, and introductions guided by what your family looks for." %}</p>
+                {% endif %}
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="{% url 'accounts:register' %}" class="btn gm-btn-gold px-4">{% trans "Create free profile" %}</a>
+                    <a href="{% url 'search:browse' %}" class="btn btn-outline-light px-4">{% trans "Browse profiles" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="gm-gold-strip">
+    <div class="container-xl">
+        <form class="hero-inline-search" method="get" action="{% url 'search:browse' %}">
+            <select class="hero-inline-field" name="gender">
+                <option value="">{% trans "I'm looking for a" %}</option>
+                <option value="female">{% trans "Bride" %}</option>
+                <option value="male">{% trans "Groom" %}</option>
+            </select>
+            <select class="hero-inline-field hero-inline-small" name="age_group">
+                <option value="">{% trans "Age" %}</option>
+                <option value="21-26">21-26</option>
+                <option value="27-32">27-32</option>
+                <option value="33-40">33-40</option>
+            </select>
+            <input class="hero-inline-field" name="hometown" placeholder="{% trans 'Native gam' %}">
+            <button type="submit" class="btn gm-btn-primary hero-inline-btn">{% trans "Search" %}</button>
+        </form>
+    </div>
+</section>
+
+<section class="gm-section">
+    <div class="container-xl text-center simple-path">
+        <h2 class="gm-section-title">{% trans "A simple path to a real match" %}</h2>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <h6>1. {% trans "Register" %}</h6>
+                <p class="tiny gm-muted mb-0">{% trans "Create a verified profile with gotra and native gam." %}</p>
+            </div>
+            <div class="col-md-3">
+                <h6>2. {% trans "Set preferences" %}</h6>
+                <p class="tiny gm-muted mb-0">{% trans "Tell us what matters to your family." %}</p>
+            </div>
+            <div class="col-md-3">
+                <h6>3. {% trans "Receive matches" %}</h6>
+                <p class="tiny gm-muted mb-0">{% trans "Get curated, compatible profiles." %}</p>
+            </div>
+            <div class="col-md-3">
+                <h6>4. {% trans "Connect" %}</h6>
+                <p class="tiny gm-muted mb-0">{% trans "Message or involve family, at your pace." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
