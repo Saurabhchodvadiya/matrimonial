@@ -1,7 +1,8 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
@@ -33,6 +34,21 @@ class UserLoginView(LoginView):
 
     def get_success_url(self):
         return "/search/"
+
+
+@require_POST
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    response = redirect("home")
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate, private"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    # Clear common JWT cookie keys if the client is using cookie-based token storage.
+    for cookie_name in ("access", "refresh", "access_token", "refresh_token"):
+        response.delete_cookie(cookie_name)
+    return response
+
 
 class RegisterAPIView(generics.CreateAPIView):
     serializer_class = RegisterSerializer

@@ -2,14 +2,14 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import RegisterAPIView, UserLoginView, register_view
+from .views import RegisterAPIView, UserLoginView, logout_view, register_view
 
 app_name = "accounts"
 
 urlpatterns = [
     path("register/", register_view, name="register"),
     path("login/", UserLoginView.as_view(), name="login"),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("logout/", logout_view, name="logout"),
     path(
         "forgot-password/",
         auth_views.PasswordResetView.as_view(template_name="accounts/password_reset.html"),
